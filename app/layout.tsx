@@ -2,21 +2,20 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import ThemeProvider from "@/context/Themes";
-import { Inter } from "next/font/google";
-import { cn } from "@/lib/utils";
-
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+import Navbar from "@/components/navigation/navbar";
 
 const inter = localFont({
   src: "./fonts/Interfont.ttf",
-  variable: "--font-inter",
-  weight: "100 200 300 400 500 600 700 800 900",
+  variable: "--font-inter-local",
+  weight: "100 900",
+  display: "swap",
 });
 
 const spaceGrotesk = localFont({
   src: "./fonts/SpaceGroteskfont.ttf",
-  variable: "--font-space-grotesk",
-  weight: "300 400 500 600 700",
+  variable: "--font-space-grotesk-local",
+  weight: "300 700",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -30,9 +29,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning className={cn("font-sans", inter.variable)}>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${spaceGrotesk.variable} font-sans`}>
+      <body className="h-full antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <Navbar />
           {children}
         </ThemeProvider>
       </body>

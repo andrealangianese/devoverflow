@@ -44,9 +44,6 @@
   --background-image-auth-light: url("/images/auth-light.png");
 
   --breakpoint-xs: 420px;
-
-  --font-inter: var(--font-inter);
-  --font-space-grotesk: var(--font-space-grotesk);
 }
 
 /*
@@ -471,8 +468,10 @@ code {
   ---break---
 */
 @theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: var(--font-sans);
+  --font-heading: var(--font-space-grotesk-local);
+  --font-sans: var(--font-inter-local);
+  --font-inter: var(--font-inter-local);
+  --font-space-grotesk: var(--font-space-grotesk-local);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
