@@ -1,20 +1,27 @@
-const page = () => {
+import { auth, signOut } from "@/auth";
+import { Button } from "@/components/ui/button";
+import ROUTES from "@/constants/route";
+
+const Home = async () => {
+  const session = await auth();
+  console.log(session);
+
   return (
     <div>
       <h1 className="h1-bold">Welcome to Next.js!</h1>
-      <h1 className="h1-bold font-space-grotesk">Welcome to Next.js!</h1>
-      <h2 className="h2-bold">Welcome to Next.js!</h2>
-      <h2 className="h2-bold font-space-grotesk">Welcome to Next.js!</h2>
-      <h3 className="h3-bold">Welcome to Next.js!</h3>
-      <h3 className="h3-bold font-space-grotesk">Welcome to Next.js!</h3>
-      <p className="p-regular">Welcome to Next.js!</p>
-      <p className="p-regular font-space-grotesk">Welcome to Next.js!</p>
-      <p className="p-medium">Welcome to Next.js!</p>
-      <p className="p-medium font-space-grotesk">Welcome to Next.js!</p>
-      <p className="p-bold">Welcome to Next.js!</p>
-      <p className="p-bold font-space-grotesk">Welcome to Next.js!</p>
+
+      <form
+        className="px-10 pt-[100px]"
+        action={async () => {
+          "use server";
+
+          await signOut({ redirectTo: ROUTES.SIGN_IN });
+        }}
+      >
+        <Button type="submit">Log out</Button>
+      </form>
     </div>
   );
 };
 
-export default page;
+export default Home;

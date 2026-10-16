@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import SocialAuthForm from "@/components/forms/SocialAuthForm";
 import Image from "next/image";
 
