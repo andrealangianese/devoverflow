@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import ThemeProvider from "@/context/Themes";
 import { Toaster } from "@/components/ui/sonner";
-import { Session } from "inspector/promises";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 

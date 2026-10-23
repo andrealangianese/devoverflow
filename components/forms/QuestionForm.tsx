@@ -7,7 +7,6 @@ import { AskQuestionSchema } from "@/lib/validation";
 import { Button } from "../ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "../ui/input";
-import { Edit } from "lucide-react";
 import { useRef } from "react";
 import { MDXEditorMethods } from "@mdxeditor/editor";
 import dynamic from "next/dynamic";

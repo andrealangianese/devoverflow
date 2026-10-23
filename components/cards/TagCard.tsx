@@ -7,12 +7,12 @@ import { getDeviconClassName } from "@/lib/utils";
 interface Props {
   _id: string;
   name: string;
-  questions: number;
+  questions?: number;
   showCount?: boolean;
   compact?: boolean;
 }
 
-const TagCard = ({ _id, name, questions, showCount, compact }: Props) => {
+const TagCard = ({ _id, name, questions, showCount }: Props) => {
   const iconClass = getDeviconClassName(name);
 
   return (
@@ -24,7 +24,7 @@ const TagCard = ({ _id, name, questions, showCount, compact }: Props) => {
         </div>
       </Badge>
 
-      {showCount && <p className="small-medium text-dark500_light700">{questions}</p>}
+      {showCount && questions !== undefined && <p className="small-medium text-dark500_light700">{questions}</p>}
     </Link>
   );
 };
