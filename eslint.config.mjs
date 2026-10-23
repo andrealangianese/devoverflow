@@ -13,6 +13,14 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  "overrides": [
+    {
+      "files": ["*/*.ts", "*/*.tsx"],
+      "rules": {
+        "no-undef": "off"
+      }
+    }
+  ]
 ]);
 
 export default eslintConfig;
