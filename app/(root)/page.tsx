@@ -4,6 +4,8 @@ import Link from "next/link";
 import LocalSearch from "@/components/search/LocalSearch";
 import HomeFilter from "@/components/filter/HomeFilter";
 import QuestionCard from "@/components/cards/QuestionCard";
+import { NotFoundError } from "@/lib/http-errors";
+import handleError from "@/lib/handler/error";
 
 const questions = [
   {
@@ -45,11 +47,23 @@ const questions = [
     createdAt: new Date("2023-01-01"),
   },
 ];
+
+const test = async () => {
+  try {
+    throw new NotFoundError("Test error");
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
 interface SearchParams {
   searchParams: Promise<{ [key: string]: string }>;
 }
 
 const Home = async ({ searchParams }: SearchParams) => {
+  const result = await test();
+  console.log(result);
+
   const { query = "", filter = "" } = await searchParams;
 
   const filteredQuestions = questions.filter((question) => {
