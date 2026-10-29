@@ -4,7 +4,7 @@ import Link from "next/link";
 import LocalSearch from "@/components/search/LocalSearch";
 import HomeFilter from "@/components/filter/HomeFilter";
 import QuestionCard from "@/components/cards/QuestionCard";
-import { NotFoundError } from "@/lib/http-errors";
+import { NotFoundError, ValidationError } from "@/lib/http-errors";
 import handleError from "@/lib/handler/error";
 
 const questions = [
@@ -50,7 +50,10 @@ const questions = [
 
 const test = async () => {
   try {
-    throw new NotFoundError("Test error");
+    throw new ValidationError({
+      title: ["Required"],
+      tags: ['"JavaScript" is not a valid tag.'],
+    });
   } catch (error) {
     return handleError(error);
   }
