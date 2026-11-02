@@ -10,44 +10,33 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import ROUTES from "@/constants/route";
+import { SignInSchema, SignUpSchema } from "@/lib/validation";
 
 interface AuthFormProps {
   formType: "SIGN_IN" | "SIGN_UP";
 }
 
-const getSchema = (formType: AuthFormProps["formType"]) =>
-  z
-    .object({
-      name: z.string().optional(),
-      email: z.string().email("Please enter a valid email address"),
-      password: z.string().min(8, "Password must be at least 8 characters"),
-    })
-    .superRefine((values, context) => {
-      if (formType === "SIGN_UP" && !values.name?.trim()) {
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["name"],
-          message: "Name is required",
-        });
-      }
-    });
+type AuthFormValues = z.infer<typeof SignInSchema> | z.infer<typeof SignUpSchema>;
 
 const AuthForm = ({ formType }: AuthFormProps) => {
-  const schema = getSchema(formType);
-  const form = useForm<z.infer<typeof schema>>({
+  const schema = formType === "SIGN_IN" ? SignInSchema : SignUpSchema;
+  const form = useForm<AuthFormValues>({
     resolver: standardSchemaResolver(schema),
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues:
+      formType === "SIGN_IN"
+        ? { email: "", password: "" }
+        : { username: "", name: "", email: "", password: "" },
   });
 
-  const handleSubmit: SubmitHandler<z.infer<typeof schema>> = () => {
+  const handleSubmit: SubmitHandler<AuthFormValues> = () => {
     toast.info("Email and password authentication is not configured yet", {
       description: "Please use Google or GitHub to sign in.",
     });
   };
 
   const buttonText = formType === "SIGN_IN" ? "Sign In" : "Sign Up";
-  const fields: ("name" | "email" | "password")[] =
-    formType === "SIGN_UP" ? ["name", "email", "password"] : ["email", "password"];
+  const fields: ("username" | "name" | "email" | "password")[] =
+    formType === "SIGN_UP" ? ["username", "name", "email", "password"] : ["email", "password"];
 
   return (
     <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-10 space-y-6">
