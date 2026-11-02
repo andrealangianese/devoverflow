@@ -21,7 +21,6 @@ export async function GET() {
 // Create User
 export async function POST(request: Request) {
   try {
-    await dbConnect();
     const body = await request.json();
 
     const validatedData = UserSchema.safeParse(body);
@@ -31,6 +30,8 @@ export async function POST(request: Request) {
     }
 
     const { email, username } = validatedData.data;
+
+    await dbConnect();
 
     const existingUser = await User.findOne({ email });
     if (existingUser) throw new Error("User already exists");
