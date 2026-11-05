@@ -3,11 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Controller, DefaultValues, FieldValues, Path, Resolver, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ZodType, ZodTypeDef } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Controller, DefaultValues, FieldValues, Form, Path, Resolver, SubmitHandler, useForm } from "react-hook-form";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import ROUTES from "@/constants/route";
@@ -46,56 +46,58 @@ const AuthForm = <T extends FieldValues>({ schema, defaultValues, formType, onSu
   const buttonText = formType === "SIGN_IN" ? "Sign In" : "Sign Up";
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-10 space-y-6">
-        {Object.keys(defaultValues).map((name) => (
-          <Controller
-            key={name}
-            control={form.control}
-            name={name as Path<T>}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid} className="gap-2.5">
-                <FieldLabel htmlFor={field.name} className="paragraph-medium text-dark400_light700">
-                  {field.name === "email" ? "Email Address" : field.name.charAt(0).toUpperCase() + field.name.slice(1)}
-                </FieldLabel>
-                <Input
-                  {...field}
-                  id={field.name}
-                  required
-                  aria-invalid={fieldState.invalid}
-                  type={field.name === "password" ? "password" : "text"}
-                  className="paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 no-focus rounded-1.5 min-h-12 border"
-                />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-        ))}
+    <form
+      noValidate
+      onSubmit={form.handleSubmit(handleSubmit, (errors) => console.log("Errori validazione:", errors))}
+      className="mt-10 space-y-6"
+    >
+      {Object.keys(defaultValues).map((name) => (
+        <Controller
+          key={name}
+          control={form.control}
+          name={name as Path<T>}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="gap-2.5">
+              <FieldLabel htmlFor={field.name} className="paragraph-medium text-dark400_light700">
+                {field.name === "email" ? "Email Address" : field.name.charAt(0).toUpperCase() + field.name.slice(1)}
+              </FieldLabel>
+              <Input
+                {...field}
+                id={field.name}
+                aria-invalid={fieldState.invalid}
+                type={field.name === "password" ? "password" : "text"}
+                className="paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 no-focus rounded-1.5 min-h-12 border"
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      ))}
 
-        <Button
-          disabled={form.formState.isSubmitting}
-          className="primary-gradient paragraph-medium rounded-2 font-inter text-light-900! min-h-12 w-full px-4 py-3"
-        >
-          {form.formState.isSubmitting ? (buttonText === "Sign In" ? "Signing In..." : "Signing Up...") : buttonText}
-        </Button>
+      <Button
+        type="submit"
+        disabled={form.formState.isSubmitting}
+        className="primary-gradient paragraph-medium rounded-2 font-inter text-light-900! min-h-12 w-full px-4 py-3"
+      >
+        {form.formState.isSubmitting ? (buttonText === "Sign In" ? "Signing In..." : "Signing Up...") : buttonText}
+      </Button>
 
-        {formType === "SIGN_IN" ? (
-          <p>
-            Don&apos;t have an account?{" "}
-            <Link href={ROUTES.SIGN_UP} className="paragraph-semibold primary-text-gradient">
-              Sign up
-            </Link>
-          </p>
-        ) : (
-          <p>
-            Already have an account?{" "}
-            <Link href={ROUTES.SIGN_IN} className="paragraph-semibold primary-text-gradient">
-              Sign in
-            </Link>
-          </p>
-        )}
-      </form>
-    </Form>
+      {formType === "SIGN_IN" ? (
+        <p>
+          Don&apos;t have an account?{" "}
+          <Link href={ROUTES.SIGN_UP} className="paragraph-semibold primary-text-gradient">
+            Sign up
+          </Link>
+        </p>
+      ) : (
+        <p>
+          Already have an account?{" "}
+          <Link href={ROUTES.SIGN_IN} className="paragraph-semibold primary-text-gradient">
+            Sign in
+          </Link>
+        </p>
+      )}
+    </form>
   );
 };
 
