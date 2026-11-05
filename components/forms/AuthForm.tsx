@@ -1,105 +1,101 @@
 "use client";
 
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { z } from "zod";
+import { ZodType, ZodTypeDef } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Controller, DefaultValues, FieldValues, Form, Path, Resolver, SubmitHandler, useForm } from "react-hook-form";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import ROUTES from "@/constants/route";
-import { SignInSchema, SignUpSchema } from "@/lib/validation";
 
-interface AuthFormProps {
+interface AuthFormProps<T extends FieldValues> {
+  schema: ZodType<T, ZodTypeDef, T>;
+  defaultValues: T;
+  onSubmit: (data: T) => Promise<ActionResponse>;
   formType: "SIGN_IN" | "SIGN_UP";
 }
 
-type AuthFormValues = z.infer<typeof SignInSchema> | z.infer<typeof SignUpSchema>;
+const AuthForm = <T extends FieldValues>({ schema, defaultValues, formType, onSubmit }: AuthFormProps<T>) => {
+  const router = useRouter();
 
-const AuthForm = ({ formType }: AuthFormProps) => {
-  const schema = formType === "SIGN_IN" ? SignInSchema : SignUpSchema;
-  const form = useForm<AuthFormValues>({
-    resolver: standardSchemaResolver(schema),
-    defaultValues:
-      formType === "SIGN_IN"
-        ? { email: "", password: "" }
-        : { username: "", name: "", email: "", password: "" },
+  const form = useForm<T>({
+    resolver: zodResolver(schema) as Resolver<T>,
+    defaultValues: defaultValues as DefaultValues<T>,
   });
 
-  const handleSubmit: SubmitHandler<AuthFormValues> = () => {
-    toast.info("Email and password authentication is not configured yet", {
-      description: "Please use Google or GitHub to sign in.",
-    });
+  const handleSubmit: SubmitHandler<T> = async (data) => {
+    const result = (await onSubmit(data)) as ActionResponse;
+
+    if (result?.success) {
+      toast.success("Success", {
+        description: formType === "SIGN_IN" ? "Signed in successfully" : "Signed up successfully",
+      });
+
+      router.push(ROUTES.HOME);
+    } else {
+      toast.error(`Error ${result?.status}`, {
+        description: result?.error?.message,
+      });
+    }
   };
 
   const buttonText = formType === "SIGN_IN" ? "Sign In" : "Sign Up";
-  const fields: ("username" | "name" | "email" | "password")[] =
-    formType === "SIGN_UP" ? ["username", "name", "email", "password"] : ["email", "password"];
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-10 space-y-6">
-      <FieldGroup>
-        {fields.map((fieldName) => (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-10 space-y-6">
+        {Object.keys(defaultValues).map((name) => (
           <Controller
-            key={fieldName}
+            key={name}
             control={form.control}
-            name={fieldName}
+            name={name as Path<T>}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
+              <Field data-invalid={fieldState.invalid} className="gap-2.5">
                 <FieldLabel htmlFor={field.name} className="paragraph-medium text-dark400_light700">
                   {field.name === "email" ? "Email Address" : field.name.charAt(0).toUpperCase() + field.name.slice(1)}
                 </FieldLabel>
-
                 <Input
                   {...field}
                   id={field.name}
+                  required
                   aria-invalid={fieldState.invalid}
-                  type={field.name === "password" ? "password" : field.name === "email" ? "email" : "text"}
-                  autoComplete={
-                    field.name === "password"
-                      ? formType === "SIGN_IN"
-                        ? "current-password"
-                        : "new-password"
-                      : field.name === "email"
-                        ? "email"
-                        : "name"
-                  }
+                  type={field.name === "password" ? "password" : "text"}
                   className="paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 no-focus rounded-1.5 min-h-12 border"
                 />
-
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
         ))}
-      </FieldGroup>
 
-      <Button
-        type="submit"
-        disabled={form.formState.isSubmitting}
-        className="primary-gradient paragraph-medium rounded-2 font-inter text-light-900! min-h-12 w-full px-4 py-3"
-      >
-        {form.formState.isSubmitting ? (formType === "SIGN_IN" ? "Signing In..." : "Signing Up...") : buttonText}
-      </Button>
+        <Button
+          disabled={form.formState.isSubmitting}
+          className="primary-gradient paragraph-medium rounded-2 font-inter text-light-900! min-h-12 w-full px-4 py-3"
+        >
+          {form.formState.isSubmitting ? (buttonText === "Sign In" ? "Signing In..." : "Signing Up...") : buttonText}
+        </Button>
 
-      {formType === "SIGN_IN" ? (
-        <p>
-          Don&apos;t have an account?{" "}
-          <Link href={ROUTES.SIGN_UP} className="paragraph-semibold primary-text-gradient">
-            Sign up
-          </Link>
-        </p>
-      ) : (
-        <p>
-          Already have an account?{" "}
-          <Link href={ROUTES.SIGN_IN} className="paragraph-semibold primary-text-gradient">
-            Sign in
-          </Link>
-        </p>
-      )}
-    </form>
+        {formType === "SIGN_IN" ? (
+          <p>
+            Don&apos;t have an account?{" "}
+            <Link href={ROUTES.SIGN_UP} className="paragraph-semibold primary-text-gradient">
+              Sign up
+            </Link>
+          </p>
+        ) : (
+          <p>
+            Already have an account?{" "}
+            <Link href={ROUTES.SIGN_IN} className="paragraph-semibold primary-text-gradient">
+              Sign in
+            </Link>
+          </p>
+        )}
+      </form>
+    </Form>
   );
 };
 
