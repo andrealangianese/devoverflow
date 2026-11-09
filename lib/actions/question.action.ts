@@ -10,7 +10,7 @@ import action from "../handler/action";
 import handleError from "../handler/error";
 import { AskQuestionSchema } from "../validation";
 
-export async function createQuestion(params: CreateQuestionParams): Promise<ActionResponse> {
+export async function createQuestion(params: CreateQuestionParams): Promise<ActionResponse<Question>> {
   const validationResult = await action({
     params,
     schema: AskQuestionSchema,
